@@ -1,35 +1,34 @@
 {
-    "name": "server",
+    "name": "jobtrack-server",
     "version": "1.0.0",
-    "description": "",
-    "main": "dist/server",
+    "description": "Backend API for JobTrack application tracker",
+    "main": "dist/server.js",
     "type": "module",
     "scripts": {
         "test": "vitest --typecheck",
         "test:ci": "vitest run",
         "start": "node --experimental-strip-types server.ts",
-        "build": "npx tsc",
+        "build": "tsc",
         "dev": "tsx --watch --env-file=.env server.ts",
         "init-db": "node --env-file=.env database/init-db.js"
     },
-    "keywords": [],
-    "author": "",
+    "keywords": ["jobtrack", "backend", "express", "mongodb"],
+    "author": "Roger Galan, Cassidy Whitehead, Jesus Tortolero Hernandez",
     "license": "ISC",
     "devDependencies": {
+        "@types/cors": "^2.8.19",
         "@types/express": "^5.0.5",
+        "@types/json-schema": "^7.0.15",
         "@types/jsonwebtoken": "^9.0.10",
         "@types/morgan": "^1.9.10",
         "@types/node": "^22.13.9",
-        "dotenv": "^17.2.3",
+        "@types/swagger-ui-express": "^4.1.8",
         "tsx": "^4.19.3",
         "typescript": "^5.8.2",
         "vite": "^7.2.4",
         "vitest": "^4.0.13"
     },
     "dependencies": {
-        "@types/cors": "^2.8.19",
-        "@types/json-schema": "^7.0.15",
-        "@types/swagger-ui-express": "^4.1.8",
         "ajv": "^8.20.0",
         "ajv-formats": "^3.0.1",
         "ajv-keywords": "^5.1.0",
@@ -43,10 +42,5 @@
         "morgan": "^1.10.1",
         "swagger-ui-express": "^5.0.1"
     },
-    "packageManager": "pnpm@10.6.1+sha512.40ee09af407fa9fbb5fbfb8e1cb40fbb74c0af0c3e10e9224d7b53c7658528615b2c92450e74cfad91e3a2dcafe3ce4050d80bda71d757756d2ce2b66213e9a3",
-    "pnpm": {
-        "onlyBuiltDependencies": [
-            "esbuild"
-        ]
-    }
+    "packageManager": "pnpm@10.6.1+sha512.40ee09af407fa9fbb5fbfb8e1cb40fbb74c0af0c3e10e9224d7b53c7658528615b2c92450e74cfad91e3a2dcafe3ce4050d80bda71d757756d2ce2b66213e9a3"
 }

@@ -15,7 +15,7 @@ let db: Db | null = null;
 export async function initializeDatabase(): Promise<Db> {
     try {
         await client.connect();
-        db = client.db(process.env.DATABASE_NAME || "better-auth");
+        db = client.db(process.env.DATABASE_NAME || "jobtrack");
         console.log("Database connection established");
         return db;
     } catch (error: unknown) {
