@@ -1,4 +1,4 @@
-import { initializeDatabase, getDatabase, closeDatabase } from "./index.js";
+import { initializeDatabase, getDatabase, closeDatabase } from "./index.ts";
 
 async function initCollections() {
   try {
@@ -6,28 +6,7 @@ async function initCollections() {
     await initializeDatabase();
     const db = getDatabase();
 
-    console.log("Creating collections and indexes...");
-
-    // --- USERS ---
-    await db.createCollection("users", {
-      validator: {
-        $jsonSchema: {
-          bsonType: "object",
-          required: ["name", "email", "passwordHash", "createdAt", "updatedAt"],
-          properties: {
-            name: { bsonType: "string", minLength: 1, maxLength: 100 },
-            email: { bsonType: "string" },
-            passwordHash: { bsonType: "string" },
-            timezone: { bsonType: "string" },
-            createdAt: { bsonType: "date" },
-            updatedAt: { bsonType: "date" }
-          }
-        }
-      }
-    }).catch(err => { if (err.codeName !== 'NamespaceExists') throw err; });
-    
-    await db.collection("users").createIndex({ email: 1 }, { unique: true });
-    console.log("Users collection and indexes created.");
+    console.log("Creating application-specific collections and indexes...");
 
     // --- APPLICATIONS ---
     await db.createCollection("applications", {
@@ -36,7 +15,8 @@ async function initCollections() {
           bsonType: "object",
           required: ["userId", "company", "jobTitle", "status", "priority", "createdAt", "updatedAt"],
           properties: {
-            userId: { bsonType: "objectId" },
+            // Note: Better-Auth uses string IDs for users, not ObjectIds
+            userId: { bsonType: "string" }, 
             company: { bsonType: "string", maxLength: 150 },
             jobTitle: { bsonType: "string", maxLength: 150 },
             status: { enum: ["wishlist", "applied", "interviewing", "offer", "closed"] },
@@ -72,7 +52,7 @@ async function initCollections() {
     await db.collection("notes").createIndex({ applicationId: 1, createdAt: 1 });
     console.log("Notes collection and indexes created.");
 
-    console.log("All collections and indexes successfully initialized!");
+    console.log("All application collections and indexes successfully initialized!");
   } catch (error) {
     console.error("Error initializing database:", error);
   } finally {

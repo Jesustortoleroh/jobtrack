@@ -5,67 +5,56 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
+import { toNodeHandler } from "better-auth/node";
 
-// Local Imports (NOTE: .mts extension is required in ESM)
+// Local Imports
+import { auth } from "./auth.ts";
 import routes from './routes/index.ts';
 import EntityNotFoundError from './errors/EntityNotFoundError.ts';
 import { globalErrorHandler } from './middleware/error.middleware.ts';
-import { initializeDatabase } from './database/index.ts';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Initialize database before starting server
-await initializeDatabase();
-
 const app: express.Application = express();
-// Serve static files from the public folder
+
+// --- 1. BETTER AUTH HANDLER ---
+// This must be mounted BEFORE express.json() so Better-Auth can handle its own body parsing.
+// Using '/api/auth/*splat' for Express 5.
+app.all("/api/auth/*splat", toNodeHandler(auth));
+
+// --- 2. GLOBAL MIDDLEWARES ---
 app.use(express.static(path.join(__dirname, "public")));
-app.use(express.urlencoded({ extended: true })); // to parse the incoming requests with URL parameters
-app.use(express.json({ limit: '10kb' })); // To parse the incoming requests with JSON payloads
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10kb' }));
 
-// --- 1. GLOBAL MIDDLEWARES ---
-
-// Set security HTTP headers
-// (Protects against XSS, sniffer attacks, etc.)
 app.use(helmet());
-
-// Allow requests from the frontend (a different origin, e.g. localhost:5173)
 app.use(cors());
 
-// Development logging
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
-// Rate Limiting (Prevent Brute Force & DOS attacks)
-// Limits requests from the same IP
 const limiter = rateLimit({
     max: 100,
-    windowMs: 60 * 60 * 1000, // 1 hour
+    windowMs: 60 * 60 * 1000,
     message: 'Too many requests from this IP, please try again in an hour!'
 });
 app.use('/api', limiter);
 
-// --- 2. ROUTES ---
-// We use versioning (/v1) so we can update the API later without breaking old clients
+// --- 3. ROUTES ---
 app.use('/api/v1/', routes);
 
-
-// Health Check (Used by Docker/AWS to check if app is alive)
+// Health Check
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'success', message: 'Server is running' });
 });
 
-// --- 3. ERROR HANDLING ---
-
-// Handle Unhandled Routes (404)
-// If code reaches here, it means no route matched above
+// --- 4. ERROR HANDLING ---
 app.use((req, res, next) => {
     next(new EntityNotFoundError({ message: `Can't find ${req.originalUrl} on this server!`, code: 'ERR_NF', statusCode: 404 }));
 });
 
-// Global Error Handler
 app.use(globalErrorHandler);
 
-// Default export replaces module.exports
 export default app;

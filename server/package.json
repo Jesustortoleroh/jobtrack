@@ -12,7 +12,12 @@
         "dev": "tsx --watch --env-file=.env server.ts",
         "init-db": "tsx --env-file=.env database/init-db.ts"
     },
-    "keywords": ["jobtrack", "backend", "express", "mongodb"],
+    "keywords": [
+        "jobtrack",
+        "backend",
+        "express",
+        "mongodb"
+    ],
     "author": "Roger Galan, Cassidy Whitehead, Jesus Tortolero Hernandez",
     "license": "ISC",
     "devDependencies": {
@@ -29,10 +34,12 @@
         "vitest": "^4.0.13"
     },
     "dependencies": {
+        "@better-auth/mongo-adapter": "^1.7.28",
         "ajv": "^8.20.0",
         "ajv-formats": "^3.0.1",
         "ajv-keywords": "^5.1.0",
         "argon2": "^0.45.1",
+        "better-auth": "^1.7.28",
         "cors": "^2.8.6",
         "express": "^5.1.0",
         "express-rate-limit": "^8.2.1",
