@@ -1,7 +1,9 @@
-import { closeDatabase } from "./database/index.ts";
-import app from "./app.ts";
+import { closeDatabase, initializeDatabase } from "./database/index.ts";
 
 const port = process.env.PORT || 3000;
+
+await initializeDatabase();
+const { default: app } = await import("./app.ts");
 
 const server = app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
